@@ -162,28 +162,29 @@ namespace Score_Calculator.Controllers
                     // If last frame use the extra throw instead of calculating the next frame
                     if (idxFrame == 9)
                     {
+                        // If throw2 is null then frame cannot be determined 
                         if (lstFrames[idxFrame].Throw2 == null)
                         {
                             sb.Append("*,");
                         }
                         else
                         {
-                            if (lstFrames[idxFrame].Throw2.Value == 10)
+                            if (lstFrames[idxFrame].Throw1 + lstFrames[idxFrame].Throw2.Value < 10)
                             {
+                                currentScore += lstFrames[idxFrame].Throw1 + lstFrames[idxFrame].Throw2.Value;
+                            }
+                            else
+                            {
+                                // If extra throw is null then frame cannot be determined
                                 if (lstFrames[idxFrame].ExtraThrow == null)
                                 {
                                     sb.Append("*,");
                                 }
                                 else
                                 {
-                                    currentScore += 20 + lstFrames[idxFrame].ExtraThrow.Value;
+                                    currentScore += lstFrames[idxFrame].Throw1 + lstFrames[idxFrame].Throw2.Value + lstFrames[idxFrame].ExtraThrow.Value;
                                     sb.Append($"{currentScore},");
                                 }
-                            }
-                            else
-                            {
-                                currentScore += 10 + lstFrames[idxFrame].Throw2.Value;
-                                sb.Append($"{currentScore},");
                             }
                         }
                     }

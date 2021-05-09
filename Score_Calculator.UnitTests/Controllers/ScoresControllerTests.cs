@@ -101,6 +101,7 @@ namespace Score_Calculator.UnitTests.Controllers
         [TestCase(new int[] { 1, 1, 1, 1, 9, 1, 2, 8, 9, 1, 10, 10 }, "[2,4,16,35,55,*,*]")]
         [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 10 }, "[4,27,44,51,60,69,78,82,90,*]")]
         [TestCase(new int[] { 6, 4, 2, 5, 1, 6, 10, 10, 10, 1, 0, 3, 7, 3 }, "[12,19,26,56,77,88,89,102,*]")]
+        [TestCase(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1 }, "[30,60,90,120,150,180,210,240,261,*]")]
         [TestCase(new int[] { 1, 2, 3, 4, 5 }, "[3,10,*]")]
         public async Task Calculate_WhenProgressScoreCannotBeDetermined_ReturnsframeProgressScoreContainsAsterisk(int[] pinsDowned, string expectedResult)
         {
