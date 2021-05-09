@@ -32,7 +32,7 @@ namespace Score_Calculator.Controllers
         public async Task<IActionResult> Calculate([FromBody] GamerScore score)
         {
             // Check if score is valid
-            if (!IsPinsDownedValid(score))
+            if (!IsPinsDownedValid(score.pinsDowned))
             {
                 return await Task.Run(() => BadRequest(new
                 {
@@ -41,7 +41,7 @@ namespace Score_Calculator.Controllers
             }
 
             // Check for gutter-ball game
-            if (IsGutterBallGame(score))
+            if (IsGutterBallGame(score.pinsDowned))
             {
                 return await Task.Run(() => Ok(new GameStatus
                 {
@@ -51,7 +51,7 @@ namespace Score_Calculator.Controllers
             }
 
             // Check for perfect game
-            if (IsPerfectGame(score))
+            if (IsPerfectGame(score.pinsDowned))
             {
                 return await Task.Run(() => Ok(new GameStatus
                 {
@@ -60,62 +60,64 @@ namespace Score_Calculator.Controllers
                 }));
             }
 
-            return await Task.Run(() => Ok(CalculateScorePlusProgress(score)));
+            return await Task.Run(() => Ok(CalculateScorePlusProgress(score.pinsDowned)));
         }
 
         #endregion
 
         #region Internal Methods
 
-        protected bool IsGutterBallGame(GamerScore score)
+        protected bool IsGutterBallGame(int[] pinsDowned)
         {
-            return score.pinsDowned.Where(x => x == 0).Count() == 20;
+            return pinsDowned.Where(x => x == 0).Count() == 20;
         }
 
-        protected bool IsPerfectGame(GamerScore score)
+        protected bool IsPerfectGame(int[] pinsDowned)
         {
-            return score.pinsDowned.Where(x => x == 10).Count() == 12;
+            return pinsDowned.Where(x => x == 10).Count() == 12;
         }
 
-        protected bool IsPinsDownedValid(GamerScore score)
+        protected bool IsPinsDownedValid(int[] pinsDowned)
         {
             // Check if pinsDowned is null
-            if (score.pinsDowned == null)
+            if (pinsDowned == null)
                 return false;
 
+            List<BowlingFrame> lstFrames = ConvertToFrames(pinsDowned);
+
             // No of throws cannot be > 21
-            if (score.pinsDowned.Count() > 21)
+            if (pinsDowned.Count() > 21)
                 return false;
 
             // If no of throws = 21, then no of strikes cannot be greater than 3 i.e. 10th frame is the only one to be allowed 3 strikes
-            if (score.pinsDowned.Count() == 21 && score.pinsDowned.Where(x => x == 10).Count() > 3)
+            if (pinsDowned.Count() == 21 && pinsDowned.Where(x => x == 10).Count() > 3)
                 return false;
 
             // No of pins knocked down cannot be < 0
-            if (score.pinsDowned.Where(x => x < 0).Count() > 0)
+            if (pinsDowned.Where(x => x < 0).Count() > 0)
                 return false;
 
             // No of pins knocked down cannot be > 10
-            if (score.pinsDowned.Where(x => x > 10).Count() > 0)
+            if (pinsDowned.Where(x => x > 10).Count() > 0)
                 return false;
 
             // If no of throws = 21 then check for validity of the 10th frame to have 3 throws
-            if (score.pinsDowned.Count() == 21)
+            if (pinsDowned.Count() == 21)
             {
-                if ((score.pinsDowned[18] != 10 && score.pinsDowned[19] != 10) || (score.pinsDowned[18] + score.pinsDowned[19] == 10))
+                if ((pinsDowned[18] != 10 && pinsDowned[19] != 10) || (pinsDowned[18] + pinsDowned[19] == 10))
                     return false;
             }
 
             // Check for each frame not adding upto more than 10
-            for (int idx = 0; idx < score.pinsDowned.Count();)
+            for (int idx = 0; idx < pinsDowned.Count();)
             {
-                if (idx != score.pinsDowned.Count() - 1)
+                if (idx != pinsDowned.Count() - 1)
                 {
                     // If strike check next value
-                    if (score.pinsDowned[idx] == 10)
+                    if (pinsDowned[idx] == 10)
                         idx++;
                     // If current frame add upto less than 10 move to next frame
-                    else if (score.pinsDowned[idx] + score.pinsDowned[idx + 1] <= 10)
+                    else if (pinsDowned[idx] + pinsDowned[idx + 1] <= 10)
                         idx += 2;
                     // Current frame add upto more than 10 i.e. invalid
                     else
@@ -125,16 +127,31 @@ namespace Score_Calculator.Controllers
                     break;
             }
 
+            // Check if the 10th frame's extra throw is valid only if first two throws are strike or spare
+            if (lstFrames.Count() == 10)
+            {
+                if (lstFrames[9].ExtraThrow != null)
+                {
+                    if ((lstFrames[9].Throw1 == 10 && lstFrames[9].Throw2 == 10) || (lstFrames[9].Throw1 + lstFrames[9].Throw2.Value == 10))
+                    {
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
             return true;
         }
 
-        protected GameStatus CalculateScorePlusProgress(GamerScore score)
+        protected GameStatus CalculateScorePlusProgress(int[] pinsDowned)
         {
             int idxFrame = 0;
             int currentScore = 0;
             StringBuilder sb = new StringBuilder();
             GameStatus gameStatus = new GameStatus { gameCompleted = false };
-            List<BowlingFrame> lstFrames = ConvertToFrames(score);
+            List<BowlingFrame> lstFrames = ConvertToFrames(pinsDowned);
 
             // Calculate scores
             for (; idxFrame < lstFrames.Count(); idxFrame++)
@@ -271,40 +288,40 @@ namespace Score_Calculator.Controllers
             return gameStatus;
         }
 
-        protected List<BowlingFrame> ConvertToFrames(GamerScore score)
+        protected List<BowlingFrame> ConvertToFrames(int[] pinsDowned)
         {
             List<BowlingFrame> lstFrames = new List<BowlingFrame>();
 
-            for (int rolls = 0; rolls < score.pinsDowned.Count();)
+            for (int rolls = 0; rolls < pinsDowned.Count();)
             {
-                BowlingFrame bowlingFrame = new BowlingFrame { Throw1 = score.pinsDowned[rolls] };
+                BowlingFrame bowlingFrame = new BowlingFrame { Throw1 = pinsDowned[rolls] };
 
                 // Check if this is the 10th Frame
                 if (lstFrames.Count == 9)
                 {
-                    if (rolls + 2 == score.pinsDowned.Count() - 1)
+                    if (rolls + 2 == pinsDowned.Count() - 1)
                     {
-                        bowlingFrame.Throw2     = score.pinsDowned[rolls + 1];
-                        bowlingFrame.ExtraThrow = score.pinsDowned[rolls + 2];
+                        bowlingFrame.Throw2     = pinsDowned[rolls + 1];
+                        bowlingFrame.ExtraThrow = pinsDowned[rolls + 2];
                     }
 
-                    if (rolls + 1 == score.pinsDowned.Count() - 1)
+                    if (rolls + 1 == pinsDowned.Count() - 1)
                     {
-                        bowlingFrame.Throw2 = score.pinsDowned[rolls + 1];
+                        bowlingFrame.Throw2 = pinsDowned[rolls + 1];
                     }
 
                     lstFrames.Add(bowlingFrame);
                     break;
                 }
 
-                if (score.pinsDowned[rolls] == 10)
+                if (pinsDowned[rolls] == 10)
                 {
                     rolls++;
                 }
                 else
                 {
-                    if(rolls < score.pinsDowned.Count() - 1)
-                        bowlingFrame.Throw2 = score.pinsDowned[rolls + 1];
+                    if(rolls < pinsDowned.Count() - 1)
+                        bowlingFrame.Throw2 = pinsDowned[rolls + 1];
                     rolls += 2;
                 }
 
