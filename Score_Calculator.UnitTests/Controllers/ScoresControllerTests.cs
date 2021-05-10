@@ -79,7 +79,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(gamer);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EqualTo("[0,0,0,0,0,0,0,0,0,0]"));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(new string[] { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" }));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.True);
         }
 
@@ -93,17 +93,17 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(gamer);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EqualTo("[30,60,90,120,150,180,210,240,270,300]"));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(new string[] { "30", "60", "90", "120", "150", "180", "210", "240", "270", "300" }));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.True);
         }
 
         [Test]
-        [TestCase(new int[] { 1, 1, 1, 1, 9, 1, 2, 8, 9, 1, 10, 10 }, "[2,4,16,35,55,*,*]")]
-        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 10 }, "[4,27,44,51,60,69,78,82,90,*]")]
-        [TestCase(new int[] { 6, 4, 2, 5, 1, 6, 10, 10, 10, 1, 0, 3, 7, 3 }, "[12,19,26,56,77,88,89,102,*]")]
-        [TestCase(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1 }, "[30,60,90,120,150,180,210,240,261,*]")]
-        [TestCase(new int[] { 1, 2, 3, 4, 5 }, "[3,10,*]")]
-        public async Task Calculate_WhenProgressScoreCannotBeDetermined_ReturnsframeProgressScoreContainsAsterisk(int[] pinsDowned, string expectedResult)
+        [TestCase(new int[] { 1, 1, 1, 1, 9, 1, 2, 8, 9, 1, 10, 10 }, new string[] { "2", "4", "16", "35", "55", "*", "*" })]
+        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 10 }, new string[] {"4", "27", "44", "51", "60", "69", "78", "82", "90", "*"})]
+        [TestCase(new int[] { 6, 4, 2, 5, 1, 6, 10, 10, 10, 1, 0, 3, 7, 3 }, new string[] { "12", "19", "26", "56", "77", "88", "89", "102", "*" })]
+        [TestCase(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1 }, new string[] { "30", "60", "90", "120", "150", "180", "210", "240", "261", "*" })]
+        [TestCase(new int[] { 1, 2, 3, 4, 5 }, new string[] { "3", "10", "*" })]
+        public async Task Calculate_WhenProgressScoreCannotBeDetermined_ReturnsframeProgressScoreContainsAsterisk(int[] pinsDowned, string[] expectedResult)
         {
             // Arrange
             _gamerScore.pinsDowned = pinsDowned;
@@ -112,16 +112,16 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EqualTo(expectedResult));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(expectedResult));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.False);
         }
 
         [Test]
-        [TestCase(new int[] { 1, 1, 1, 1, 9, 1, 2, 8, 9, 1, 5, 4, 6, 1 }, "[2,4,16,35,50,59,66]")]
-        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 10 }, "[4,27,44,51,60,69,78,82,90,*]")]
-        [TestCase(new int[] { 6, 4, 2, 5, 1, 6, 10, 10, 10, 1, 0, 3, 7, 3 }, "[12,19,26,56,77,88,89,102,*]")]
-        [TestCase(new int[] { 1, 2, 3, 4, 5 }, "[3,10,*]")]
-        public async Task Calculate_WhenProgressScoreCanBeDeterminedButGameIncomplete_ReturnsframeProgressScoreDoesNotContainAsterisk(int[] pinsDowned, string expectedResult)
+        [TestCase(new int[] { 1, 1, 1, 1, 9, 1, 2, 8, 9, 1, 5, 4, 6, 1 }, new string[] { "2", "4", "16", "35", "50", "59", "66" })]
+        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 10 }, new string[] { "4", "27", "44", "51", "60", "69", "78", "82", "90", "*" })]
+        [TestCase(new int[] { 6, 4, 2, 5, 1, 6, 10, 10, 10, 1, 0, 3, 7, 3 }, new string[] { "12", "19", "26", "56", "77", "88", "89", "102", "*" })]
+        [TestCase(new int[] { 1, 2, 3, 4, 5 }, new string[] { "3", "10", "*" })]
+        public async Task Calculate_WhenProgressScoreCanBeDeterminedButGameIncomplete_ReturnsframeProgressScoreDoesNotContainAsterisk(int[] pinsDowned, string[] expectedResult)
         {
             // Arrange
             _gamerScore.pinsDowned = pinsDowned;
@@ -130,14 +130,15 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EqualTo(expectedResult));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(expectedResult));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.False);
         }
 
         [Test]
-        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 9 }, "[4,27,44,51,60,69,78,82,90,99]")]
-        [TestCase(new int[] { 3, 7, 2, 8, 1, 9, 5, 5, 9, 1, 10, 10, 7, 3, 8, 2, 10, 10, 10 }, "[12,23,38,57,77,104,124,142,162,192]")]
-        public async Task Calculate_WhenProgressScoreCanBeDeterminedAndGameIsComplete_ReturnsframeProgressScoreWithGameCompletedTrue(int[] pinsDowned, string expectedResult)
+        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 9 }, new string[] { "4", "27", "44", "51", "60", "69", "78", "82", "90", "99" })]
+        [TestCase(new int[] { 3, 7, 2, 8, 1, 9, 5, 5, 9, 1, 10, 10, 7, 3, 8, 2, 10, 10, 10 }, new string[] { "12", "23", "38", "57", "77", "104", "124", "142", "162", "192" })]
+        [TestCase(new int[] { 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9 }, new string[] { "19", "38", "57", "76", "95", "114", "133", "152", "171", "190" })]
+        public async Task Calculate_WhenProgressScoreCanBeDeterminedAndGameIsComplete_ReturnsframeProgressScoreWithGameCompletedTrue(int[] pinsDowned, string[] expectedResult)
         {
             // Arrange
             _gamerScore.pinsDowned = pinsDowned;
@@ -146,7 +147,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EqualTo(expectedResult));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(expectedResult));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.True);
         }
 
