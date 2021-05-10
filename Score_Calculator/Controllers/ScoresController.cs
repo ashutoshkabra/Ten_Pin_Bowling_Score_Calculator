@@ -20,8 +20,8 @@ namespace Score_Calculator.Controllers
     {
         #region Internal Members
 
-        private const string _gutterBallGameScore = "[0,0,0,0,0,0,0,0,0,0]";
-        private const string _perfectGameScore = "[30,60,90,120,150,180,210,240,270,300]";
+        private readonly string[] _gutterBallGameScore  = { "0","0","0","0","0","0","0","0","0","0"};
+        private readonly string[] _perfectGameScore     = {"30","60","90","120","150","180","210","240","270","300"};
 
         #endregion
 
@@ -104,8 +104,10 @@ namespace Score_Calculator.Controllers
             // If no of throws = 21 then check for validity of the 10th frame to have 3 throws
             if (pinsDowned.Count() == 21)
             {
-                if ((pinsDowned[18] != 10 && pinsDowned[19] != 10) || (pinsDowned[18] + pinsDowned[19] == 10))
+                if ((pinsDowned[18] + pinsDowned[19] < 10))
+                {
                     return false;
+                }
             }
 
             // Check for each frame not adding upto more than 10
@@ -149,7 +151,7 @@ namespace Score_Calculator.Controllers
         {
             int idxFrame = 0;
             int currentScore = 0;
-            StringBuilder sb = new StringBuilder();
+            List<string> lstScores = new List<string>();
             GameStatus gameStatus = new GameStatus { gameCompleted = false };
             List<BowlingFrame> lstFrames = ConvertToFrames(pinsDowned);
 
@@ -165,7 +167,7 @@ namespace Score_Calculator.Controllers
                         // If throw2 is null then frame cannot be determined 
                         if (lstFrames[idxFrame].Throw2 == null)
                         {
-                            sb.Append("*,");
+                            lstScores.Add("*");
                         }
                         else
                         {
@@ -178,12 +180,12 @@ namespace Score_Calculator.Controllers
                                 // If extra throw is null then frame cannot be determined
                                 if (lstFrames[idxFrame].ExtraThrow == null)
                                 {
-                                    sb.Append("*,");
+                                    lstScores.Add("*");
                                 }
                                 else
                                 {
                                     currentScore += lstFrames[idxFrame].Throw1 + lstFrames[idxFrame].Throw2.Value + lstFrames[idxFrame].ExtraThrow.Value;
-                                    sb.Append($"{currentScore},");
+                                    lstScores.Add($"{currentScore}");
                                 }
                             }
                         }
@@ -203,34 +205,34 @@ namespace Score_Calculator.Controllers
                                     if (idxFrame + 2 <= lstFrames.Count() - 1)
                                     {
                                         currentScore += 20 + lstFrames[idxFrame + 2].Throw1;
-                                        sb.Append($"{currentScore},");
+                                        lstScores.Add($"{currentScore}");
                                     }
                                     else
                                     {
-                                        sb.Append("*,");
+                                        lstScores.Add("*");
                                     }
                                 }
                                 else
                                 {
-                                    sb.Append("*,");
+                                    lstScores.Add("*");
                                 }
                             }
                             else
                             {
                                 currentScore += 10 + lstFrames[idxFrame + 1].Throw1 + lstFrames[idxFrame + 1].Throw2.Value;
-                                sb.Append($"{currentScore},");
+                                lstScores.Add($"{currentScore}");
                             }
                         }
                         else
                         {
-                            sb.Append("*,");
+                            lstScores.Add("*");
                         }
                     }
                 }
                 // Cannot ascertain the score of current frame
                 else if (lstFrames[idxFrame].Throw2 == null)
                 {
-                    sb.Append("*,");
+                    lstScores.Add("*");
                 }
                 else
                 {
@@ -242,12 +244,12 @@ namespace Score_Calculator.Controllers
                         {
                             if (lstFrames[idxFrame].ExtraThrow == null)
                             {
-                                sb.Append("*,");
+                                lstScores.Add("*");
                             }
                             else
                             {
                                 currentScore += 10 + lstFrames[idxFrame].ExtraThrow.Value;
-                                sb.Append($"{currentScore},");
+                                lstScores.Add($"{currentScore}");
                             }
                         }
                         else
@@ -256,23 +258,23 @@ namespace Score_Calculator.Controllers
                             if (idxFrame + 1 <= lstFrames.Count() - 1)
                             {
                                 currentScore += 10 + lstFrames[idxFrame + 1].Throw1;
-                                sb.Append($"{currentScore},");
+                                lstScores.Add($"{currentScore}");
                             }
                             else
                             {
-                                sb.Append("*,");
+                                lstScores.Add("*");
                             }
                         }
                     }
                     else
                     {
                         currentScore += lstFrames[idxFrame].Throw1 + lstFrames[idxFrame].Throw2.Value;
-                        sb.Append($"{currentScore},");
+                        lstScores.Add($"{currentScore}");
                     }
                 }
             }
 
-            gameStatus.frameProgressScore = $"[{sb.ToString().TrimEnd(',')}]";
+            gameStatus.frameProgressScore = lstScores.ToArray();
 
             if (gameStatus.frameProgressScore.Contains("*"))
             {

@@ -11,7 +11,7 @@ namespace Score_Calculator.Models
 {
     public class GameStatus
     {
-        public string frameProgressScore { get; set; }
+        public string[] frameProgressScore { get; set; }
 
         public bool gameCompleted { get; set; }
     }
