@@ -36,7 +36,7 @@ namespace Score_Calculator.Controllers
             {
                 return await Task.Run(() => BadRequest(new
                 {
-                    message = "Invalid score"
+                    message = "Error: Invalid score"
                 }));
             }
 
@@ -87,6 +87,10 @@ namespace Score_Calculator.Controllers
 
             // No of throws cannot be > 21
             if (pinsDowned.Count() > 21)
+                return false;
+
+            // No of throws less than 21 but frames cannot be greater than 10
+            if (lstFrames.Count() > 10)
                 return false;
 
             // If no of throws = 21, then no of strikes cannot be greater than 3 i.e. 10th frame is the only one to be allowed 3 strikes
@@ -300,35 +304,53 @@ namespace Score_Calculator.Controllers
                 BowlingFrame bowlingFrame = new BowlingFrame { Throw1 = pinsDowned[rolls] };
 
                 // Check if this is the 10th Frame
-                if (lstFrames.Count == 9)
+                if (lstFrames.Count >= 9)
                 {
                     if (rolls + 2 == pinsDowned.Count() - 1)
                     {
-                        bowlingFrame.Throw2     = pinsDowned[rolls + 1];
+                        bowlingFrame.Throw2 = pinsDowned[rolls + 1];
                         bowlingFrame.ExtraThrow = pinsDowned[rolls + 2];
+                        lstFrames.Add(bowlingFrame);
+                        break;
                     }
-
-                    if (rolls + 1 == pinsDowned.Count() - 1)
+                    // If last 1
+                    else if (rolls + 1 == pinsDowned.Count() - 1)
                     {
                         bowlingFrame.Throw2 = pinsDowned[rolls + 1];
+                        lstFrames.Add(bowlingFrame);
+                        break;
                     }
+                    else
+                    {
+                        if (pinsDowned[rolls] == 10)
+                        {
+                            rolls++;
+                        }
+                        else
+                        {
+                            if (rolls < pinsDowned.Count() - 1)
+                                bowlingFrame.Throw2 = pinsDowned[rolls + 1];
+                            rolls += 2;
+                        }
 
-                    lstFrames.Add(bowlingFrame);
-                    break;
-                }
-
-                if (pinsDowned[rolls] == 10)
-                {
-                    rolls++;
+                        lstFrames.Add(bowlingFrame);
+                    }
                 }
                 else
                 {
-                    if(rolls < pinsDowned.Count() - 1)
-                        bowlingFrame.Throw2 = pinsDowned[rolls + 1];
-                    rolls += 2;
-                }
+                    if (pinsDowned[rolls] == 10)
+                    {
+                        rolls++;
+                    }
+                    else
+                    {
+                        if (rolls < pinsDowned.Count() - 1)
+                            bowlingFrame.Throw2 = pinsDowned[rolls + 1];
+                        rolls += 2;
+                    }
 
-                lstFrames.Add(bowlingFrame);
+                    lstFrames.Add(bowlingFrame);
+                }
             }
 
             return lstFrames;
