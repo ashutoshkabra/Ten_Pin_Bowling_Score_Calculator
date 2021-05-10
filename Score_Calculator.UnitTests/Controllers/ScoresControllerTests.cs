@@ -41,25 +41,25 @@ namespace Score_Calculator.UnitTests.Controllers
 
         [Test]
         // Null
-        [TestCase(null)]
+        [TestCase(null, "{ message = Error: Input pinsDowned cannot be null. }")]
         // No of throws cannot be > 21
-        [TestCase(new int[] { 1, 8, 3, 6, 5, 4, 7, 2, 9, 0, 0, 9, 2, 7, 4, 5, 6, 3, 8, 1, 1, 8, 3, 6, 5, 4, 7, 2 })]
+        [TestCase(new int[] { 1, 8, 3, 6, 5, 4, 7, 2, 9, 0, 0, 9, 2, 7, 4, 5, 6, 3, 8, 1, 1, 8, 3, 6, 5, 4, 7, 2 }, "{ message = Error: No of throws cannot be > 21. }")]
         // No of throws less than 21 but frames cannot be greater than 10
-        [TestCase(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1 })]
+        [TestCase(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1 }, "{ message = Error: No of frames cannot be > 10. }")]
         // If no of throws = 21, then no of strikes cannot be greater than 3 i.e. 10th frame is the only one to be allowed 3 strikes
-        [TestCase(new int[] { 1, 8, 3, 6, 5, 4, 7, 2, 9, 10, 0, 9, 2, 7, 4, 5, 6, 3, 10, 10, 10 })]
+        [TestCase(new int[] { 1, 8, 3, 6, 5, 4, 7, 2, 9, 10, 0, 9, 2, 7, 4, 5, 6, 3, 10, 10, 10 }, "{ message = Error: In 21 throws there cannot be more than 3 strikes that too at the end. }")]
         // No of pins knocked down cannot be < 0
-        [TestCase(new int[] { -5, -10, 9, 5, 10, 6, -55, -6, -10, 9, 8, 1, 3, 5, -5, -10, 0, 0, 0, 0 })]
+        [TestCase(new int[] { -5, -10, 9, 5, 10, 6, -55, -6, -10, 9, 8, 1, 3, 5, -5, -10, 0, 0, 0, 0 }, "{ message = Error: pinsDowned cannot be < 0. }")]
         // No of pins knocked down cannot be > 10
-        [TestCase(new int[] { 5, 20, 9, 5, 10, 6, 55, 16, 100, 9, 8, 1, 3, 5, 4, 3, 0, 0, 0, 0 })]
+        [TestCase(new int[] { 5, 20, 9, 5, 10, 6, 55, 16, 100, 9, 8, 1, 3, 5, 4, 3, 0, 0, 0, 0 }, "{ message = Error: pinsDowned cannot be > 10. }")]
         // Each frame adds upto more than 10 i.e. 9 + 3 = 12 i.e. Invalid
-        [TestCase(new int[] { 4, 5, 10, 10, 9, 3 })]
-        [TestCase(new int[] { 6, 7, 8, 9, 5, 8 })]
+        [TestCase(new int[] { 4, 5, 10, 10, 9, 3 }, "{ message = Error: Frame total cannot be > 10. }")]
+        [TestCase(new int[] { 6, 7, 8, 9, 5, 8 }, "{ message = Error: Frame total cannot be > 10. }")]
         // If no of throws = 21 then check for validity of the 10th frame to have 3 throws
-        [TestCase(new int[] { 1, 2, 3, 6, 4, 5, 5, 1, 8, 0, 7, 0, 7, 0, 7, 0, 7, 0, 7, 0, 1 })]
+        [TestCase(new int[] { 1, 2, 3, 6, 4, 5, 5, 1, 8, 0, 7, 0, 7, 0, 7, 0, 7, 0, 7, 0, 1 }, "{ message = Error: 10th frame cannot have an extra throw. }")]
         // Test if the 10th frame's extra throw is valid only if first two throws are strike or spare
-        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 9, 1 })]
-        public async Task Calculate_WhenPinsDownedIsInvalid_ReturnsBadRequest(int[] pinsDowned)
+        [TestCase(new int[] { 1, 3, 10, 10, 3, 4, 5, 4, 4, 5, 3, 6, 1, 3, 5, 3, 0, 9, 1 }, "{ message = Error: 10th frame cannot have an extra throw. }")]
+        public async Task Calculate_WhenPinsDownedIsInvalid_ReturnsBadRequest(int[] pinsDowned, string expectedResult)
         {
             // Arrange
             _gamerScore.pinsDowned = pinsDowned;
@@ -68,6 +68,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
+            Assert.That(((string)((ObjectResult)actionResult).Value.ToString()), Is.EqualTo(expectedResult));
             Assert.That((int)((ObjectResult)actionResult).StatusCode, Is.EqualTo((int)HttpStatusCode.BadRequest));
         }
 

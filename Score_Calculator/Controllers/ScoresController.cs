@@ -32,11 +32,13 @@ namespace Score_Calculator.Controllers
         public async Task<IActionResult> Calculate([FromBody] GamerScore score)
         {
             // Check if score is valid
-            if (!IsPinsDownedValid(score.pinsDowned))
+            string strResult = IsPinsDownedValid(score.pinsDowned);
+
+            if (!strResult.Equals(string.Empty))
             {
                 return await Task.Run(() => BadRequest(new
                 {
-                    message = "Error: Invalid score"
+                    message = $"Error: {strResult}"
                 }));
             }
 
@@ -77,42 +79,33 @@ namespace Score_Calculator.Controllers
             return pinsDowned.Where(x => x == 10).Count() == 12;
         }
 
-        protected bool IsPinsDownedValid(int[] pinsDowned)
+        protected string IsPinsDownedValid(int[] pinsDowned)
         {
             // Check if pinsDowned is null
             if (pinsDowned == null)
-                return false;
+                return "Input pinsDowned cannot be null.";
 
             List<BowlingFrame> lstFrames = ConvertToFrames(pinsDowned);
 
             // No of throws cannot be > 21
             if (pinsDowned.Count() > 21)
-                return false;
+                return "No of throws cannot be > 21.";
 
             // No of throws less than 21 but frames cannot be greater than 10
             if (lstFrames.Count() > 10)
-                return false;
+                return "No of frames cannot be > 10.";
 
             // If no of throws = 21, then no of strikes cannot be greater than 3 i.e. 10th frame is the only one to be allowed 3 strikes
             if (pinsDowned.Count() == 21 && pinsDowned.Where(x => x == 10).Count() > 3)
-                return false;
+                return "In 21 throws there cannot be more than 3 strikes that too at the end.";
 
             // No of pins knocked down cannot be < 0
             if (pinsDowned.Where(x => x < 0).Count() > 0)
-                return false;
+                return "pinsDowned cannot be < 0.";
 
             // No of pins knocked down cannot be > 10
             if (pinsDowned.Where(x => x > 10).Count() > 0)
-                return false;
-
-            // If no of throws = 21 then check for validity of the 10th frame to have 3 throws
-            if (pinsDowned.Count() == 21)
-            {
-                if ((pinsDowned[18] + pinsDowned[19] < 10))
-                {
-                    return false;
-                }
-            }
+                return "pinsDowned cannot be > 10.";
 
             // Check for each frame not adding upto more than 10
             for (int idx = 0; idx < pinsDowned.Count();)
@@ -127,7 +120,7 @@ namespace Score_Calculator.Controllers
                         idx += 2;
                     // Current frame add upto more than 10 i.e. invalid
                     else
-                        return false;
+                        return "Frame total cannot be > 10.";
                 }
                 else
                     break;
@@ -143,12 +136,12 @@ namespace Score_Calculator.Controllers
                     }
                     else
                     {
-                        return false;
+                        return "10th frame cannot have an extra throw.";
                     }
                 }
             }
 
-            return true;
+            return string.Empty;
         }
 
         protected GameStatus CalculateScorePlusProgress(int[] pinsDowned)
