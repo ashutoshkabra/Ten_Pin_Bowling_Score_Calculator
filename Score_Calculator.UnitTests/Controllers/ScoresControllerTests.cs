@@ -47,7 +47,7 @@ namespace Score_Calculator.UnitTests.Controllers
         // No of throws less than 21 but frames cannot be greater than 10
         [TestCase(new int[] { 10, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1 }, "{ message = Error: No of frames cannot be > 10. }")]
         // If no of throws = 21, then no of strikes cannot be greater than 3 i.e. 10th frame is the only one to be allowed 3 strikes
-        [TestCase(new int[] { 1, 8, 3, 6, 5, 4, 7, 2, 9, 10, 0, 9, 2, 7, 4, 5, 6, 3, 10, 10, 10 }, "{ message = Error: In 21 throws there cannot be more than 3 strikes that too at the end. }")]
+        [TestCase(new int[] { 1, 8, 3, 6, 5, 4, 7, 2, 9, 10, 0, 9, 2, 7, 4, 5, 6, 3, 10, 10, 10 }, "{ message = Error: In 21 throws there cannot be more than 3 strikes. }")]
         // No of pins knocked down cannot be < 0
         [TestCase(new int[] { -5, -10, 9, 5, 10, 6, -55, -6, -10, 9, 8, 1, 3, 5, -5, -10, 0, 0, 0, 0 }, "{ message = Error: pinsDowned cannot be < 0. }")]
         // No of pins knocked down cannot be > 10
