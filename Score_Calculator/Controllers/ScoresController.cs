@@ -47,7 +47,7 @@ namespace Score_Calculator.Controllers
             {
                 return await Task.Run(() => Ok(new GameStatus
                 {
-                    frameProgressScore = _gutterBallGameScore,
+                    frameProgressScores = _gutterBallGameScore,
                     gameCompleted = true
                 }));
             }
@@ -57,7 +57,7 @@ namespace Score_Calculator.Controllers
             {
                 return await Task.Run(() => Ok(new GameStatus
                 {
-                    frameProgressScore = _perfectGameScore,
+                    frameProgressScores = _perfectGameScore,
                     gameCompleted = true
                 }));
             }
@@ -271,9 +271,9 @@ namespace Score_Calculator.Controllers
                 }
             }
 
-            gameStatus.frameProgressScore = lstScores.ToArray();
+            gameStatus.frameProgressScores = lstScores.ToArray();
 
-            if (gameStatus.frameProgressScore.Contains("*"))
+            if (gameStatus.frameProgressScores.Contains("*"))
             {
                 gameStatus.gameCompleted = false;
             }

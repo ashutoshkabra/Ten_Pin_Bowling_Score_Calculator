@@ -82,7 +82,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(gamer);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(new string[] { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" }));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScores, Is.EquivalentTo(new string[] { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" }));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.True);
         }
 
@@ -96,7 +96,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(gamer);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(new string[] { "30", "60", "90", "120", "150", "180", "210", "240", "270", "300" }));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScores, Is.EquivalentTo(new string[] { "30", "60", "90", "120", "150", "180", "210", "240", "270", "300" }));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.True);
         }
 
@@ -115,7 +115,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(expectedResult));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScores, Is.EquivalentTo(expectedResult));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.False);
         }
 
@@ -133,7 +133,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(expectedResult));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScores, Is.EquivalentTo(expectedResult));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.False);
         }
 
@@ -150,7 +150,7 @@ namespace Score_Calculator.UnitTests.Controllers
             IActionResult actionResult = await _scoreController.Calculate(_gamerScore);
 
             // Assert
-            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScore, Is.EquivalentTo(expectedResult));
+            Assert.That(((GameStatus)((ObjectResult)actionResult).Value).frameProgressScores, Is.EquivalentTo(expectedResult));
             Assert.That(((GameStatus)((ObjectResult)actionResult).Value).gameCompleted, Is.True);
         }
 
