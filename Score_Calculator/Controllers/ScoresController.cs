@@ -20,9 +20,6 @@ namespace Score_Calculator.Controllers
     {
         #region Internal Members
 
-        private readonly string[] _gutterBallGameScore  = { "0","0","0","0","0","0","0","0","0","0"};
-        private readonly string[] _perfectGameScore     = {"30","60","90","120","150","180","210","240","270","300"};
-
         #endregion
 
         #region AllowAnonymous Methods
@@ -42,42 +39,12 @@ namespace Score_Calculator.Controllers
                 }));
             }
 
-            // Check for gutter-ball game
-            if (IsGutterBallGame(score.pinsDowned))
-            {
-                return await Task.Run(() => Ok(new GameStatus
-                {
-                    frameProgressScore = _gutterBallGameScore,
-                    gameCompleted = true
-                }));
-            }
-
-            // Check for perfect game
-            if (IsPerfectGame(score.pinsDowned))
-            {
-                return await Task.Run(() => Ok(new GameStatus
-                {
-                    frameProgressScore = _perfectGameScore,
-                    gameCompleted = true
-                }));
-            }
-
             return await Task.Run(() => Ok(CalculateScorePlusProgress(score.pinsDowned)));
         }
 
         #endregion
 
         #region Internal Methods
-
-        protected bool IsGutterBallGame(int[] pinsDowned)
-        {
-            return pinsDowned.Where(x => x == 0).Count() == 20;
-        }
-
-        protected bool IsPerfectGame(int[] pinsDowned)
-        {
-            return pinsDowned.Where(x => x == 10).Count() == 12;
-        }
 
         protected string IsPinsDownedValid(int[] pinsDowned)
         {
