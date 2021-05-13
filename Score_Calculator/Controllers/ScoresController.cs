@@ -64,7 +64,7 @@ namespace Score_Calculator.Controllers
 
             // If no of throws = 21, then no of strikes cannot be greater than 3 i.e. 10th frame is the only one to be allowed 3 strikes
             if (pinsDowned.Count() == 21 && pinsDowned.Where(x => x == 10).Count() > 3)
-                return "In 21 throws there cannot be more than 3 strikes that too at the end.";
+                return "In 21 throws there cannot be more than 3 strikes.";
 
             // No of pins knocked down cannot be < 0
             if (pinsDowned.Where(x => x < 0).Count() > 0)
@@ -238,9 +238,9 @@ namespace Score_Calculator.Controllers
                 }
             }
 
-            gameStatus.frameProgressScore = lstScores.ToArray();
+            gameStatus.frameProgressScores = lstScores.ToArray();
 
-            if (gameStatus.frameProgressScore.Contains("*"))
+            if (gameStatus.frameProgressScores.Contains("*"))
             {
                 gameStatus.gameCompleted = false;
             }
