@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Score_Calculator.Helper;
+
 #endregion
 
 namespace Score_Calculator
@@ -29,6 +31,9 @@ namespace Score_Calculator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // Dependency Injection
+            services.AddSingleton<iValidator, Validator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
